@@ -1,0 +1,38 @@
+
+name: Build EthanRP Launcher
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build Windows EXE
+        shell: pwsh
+        run: |
+          dotnet publish EthanRP.Launcher.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:EnableWindowsTargeting=true `
+            -o publish
+
+      - name: Upload EthanRP Launcher
+        uses: actions/upload-artifact@v4
+        with:
+          name: EthanRP-Launcher-Windows
+          path: publish/
+          if-no-files-found: error
